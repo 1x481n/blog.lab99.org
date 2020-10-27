@@ -12,7 +12,7 @@ timezone: Asia/Shanghai
 
 # URL
 ## If your site is put in a subdirectory, set url as 'http://yoursite.com/child' and root as '/child/'
-url: https://blog.lab99.org
+url: https://blog-lab99-org.putstack.com
 root: /
 permalink: :layout/:title.html
 permalink_defaults:
@@ -96,18 +96,18 @@ jekyll:
 
 # Social
 social:
-    github: https://github.com/twang2218
-    coding: https://coding.net/u/twang2218
+    #github: https://github.com/twang2218
+    #coding: https://coding.net/u/twang2218
 
 # Analytics
-google_analytics: UA-80785538-1
-baidu_analytics: //hm.baidu.com/hm.js?ee75cf08ad330aa99f8540efa2570970
+#google_analytics: UA-80785538-1
+#baidu_analytics: //hm.baidu.com/hm.js?ee75cf08ad330aa99f8540efa2570970
 
 # Deployment
 ## Docs: https://hexo.io/docs/deployment.html
 deploy:
   - type: git
-    repo: git@git.coding.net:twang2218/twang2218.git
+    repo: git@github.com:1x481n/blog.lab99.org.git
     branch: coding-pages
-    name: Tao Wang
-    email: twang2218@gmail.com
+    name: 1x481n
+    email: 1x481n@gmail.com

@@ -3,7 +3,7 @@
   "version": "0.0.0",
   "private": true,
   "hexo": {
-    "version": "3.3.8"
+    "version": "3.9.0"
   },
   "scripts": {
     "update": "git submodule update --recursive",
@@ -14,7 +14,7 @@
     "generate": "hexo g"
   },
   "dependencies": {
-    "hexo": "^3.3.8",
+    "hexo": "^3.9.0",
     "hexo-deployer-git": "^0.3.1",
     "hexo-generator-archive": "^0.1.4",
     "hexo-generator-category": "^0.1.3",
