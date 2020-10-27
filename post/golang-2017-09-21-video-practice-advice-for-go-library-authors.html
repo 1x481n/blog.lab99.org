@@ -1,0 +1,114 @@
+<!DOCTYPE html><html lang="zh-cn"><head><meta name="generator" content="Hexo 3.9.0"><meta charset="utf-8"><meta name="X-UA-Compatible" content="IE=edge"><title> 视频笔记：给 Go 库作者的建议 - Jack Lindamood · 大桥下的蜗牛</title><meta name="description" content="无善无恶心之体，有善有恶意之动，知善知恶是良知，为善去恶是格物。"><meta name="viewport" content="width=device-width, initial-scale=1"><link rel="short icon" href="/favicon.png"><link rel="stylesheet" href="/css/jekyll.css"><link rel="stylesheet" href="https://cdn.bootcss.com/mermaid/7.0.0/mermaid.min.css"><!--[if lt IE 9]>
+<script src="js/html5shiv.min.js"></script>
+<script src="js/respond.min.js"></script>
+<![endif]--></head><body><header class="row-flex-row limit-width vh-center"><a href="/" class="logo"><img src="/favicon.png"></a><nav><ul class="nav-list"><li class="nav-list-item"><a href="/" class="nav-link">主页</a></li><li class="nav-list-item"><a href="/archives/" class="nav-link active">   博客</a></li><li class="nav-list-item"><a href="https://github.com/twang2218" target="_blank" class="nav-link">github</a></li><li class="nav-list-item"><a href="https://coding.net/u/twang2218" target="_blank" class="nav-link">coding</a></li><li class="nav-list-item"><a href="/atom.xml" class="nav-link">rss</a></li></ul></nav></header><div class="container limit-width"><section class="row-flex-row"><div class="post"><article class="post-block"><h2 class="post-title"><a href="/post/golang-2017-09-21-video-practice-advice-for-go-library-authors.html" class="post-title-link">视频笔记：给 Go 库作者的建议 - Jack Lindamood</a></h2><div class="post-meta"><ul class="post-tag-list"><li class="post-tag-item"><a href="/tags/youtube/" class="post-tag-link">youtube</a></li><li class="post-tag-item"><a href="/tags/notes/" class="post-tag-link">notes</a></li><li class="post-tag-item"><a href="/tags/golang/" class="post-tag-link">golang</a></li><li class="post-tag-item"><a href="/tags/gophercon2016/" class="post-tag-link">gophercon2016</a></li></ul><div class="post-time">2017年9月21日 星期四</div></div><div class="post-content"><link rel="stylesheet" href="/style/owl.css"><!-- toc -->
+<ul>
+<li><a href="#shi-pin-xin-xi">&#x89C6;&#x9891;&#x4FE1;&#x606F;</a><ul>
+<li><a href="#ming-ming">&#x547D;&#x540D;</a></li>
+<li><a href="#object-creation">Object Creation</a></li>
+<li><a href="#ri-zhi">&#x65E5;&#x5FD7;</a></li>
+<li><a href="#interface-vs-struct"><code>interface</code> vs <code>struct</code></a></li>
+<li><a href="#shi-me-shi-hou-panic">&#x4EC0;&#x4E48;&#x65F6;&#x5019; panic</a></li>
+<li><a href="#jian-cha-error">&#x68C0;&#x67E5; error</a></li>
+<li><a href="#yun-xu-qi-yong-ku-de-diao-shi-neng-li">&#x5141;&#x8BB8;&#x542F;&#x7528;&#x5E93;&#x7684;&#x8C03;&#x8BD5;&#x80FD;&#x529B;</a></li>
+<li><a href="#wei-ce-shi-er-she-ji">&#x4E3A;&#x6D4B;&#x8BD5;&#x800C;&#x8BBE;&#x8BA1;</a></li>
+<li><a href="#bing-fa">&#x5E76;&#x53D1;</a><ul>
+<li><a href="#channels">channels</a></li>
+<li><a href="#shi-me-shi-hou-fa-qi-goroutine">&#x4EC0;&#x4E48;&#x65F6;&#x5019;&#x53D1;&#x8D77; <code>goroutine</code></a></li>
+</ul>
+</li>
+<li><a href="#shi-me-shi-hou-shi-yong-context-context">&#x4EC0;&#x4E48;&#x65F6;&#x5019;&#x4F7F;&#x7528; context.Context</a></li>
+<li><a href="#qi-ta-zhu-yi-shi-xiang">&#x5176;&#x5B83;&#x6CE8;&#x610F;&#x4E8B;&#x9879;</a></li>
+</ul>
+</li>
+</ul>
+<!-- tocstop -->
+<h1 id="shi-pin-xin-xi"><a href="#&#x89C6;&#x9891;&#x4FE1;&#x606F;" class="headerlink" title="&#x89C6;&#x9891;&#x4FE1;&#x606F;"></a>&#x89C6;&#x9891;&#x4FE1;&#x606F; <a href="#shi-pin-xin-xi" class="header-anchor">#</a></h1><p><strong>Practical Advice for Go Library Authors</strong><br>by Jack Lindamood<br>at GopherCon 2016</p>
+<div class="owl-media owl-video owl-youtube"><iframe src="//www.youtube.com/embed/5v2fqm_8jYI" frameborder="0" webkitallowfullscreen mozallowfullscreen allowfullscreen></iframe></div>
+<p><a href="https://www.youtube.com/watch?v=5v2fqm_8jYI" target="_blank" rel="noopener">https://www.youtube.com/watch?v=5v2fqm_8jYI</a></p>
+<p>&#x5E7B;&#x706F;&#x5730;&#x5740;&#xFF1A;<a href="http://go-talks.appspot.com/github.com/cep21/go-talks/practical-advice-for-go-library-authors.slide#1" target="_blank" rel="noopener">http://go-talks.appspot.com/github.com/cep21/go-talks/practical-advice-for-go-library-authors.slide#1</a></p>
+<h2 id="ming-ming"><a href="#&#x547D;&#x540D;" class="headerlink" title="&#x547D;&#x540D;"></a>&#x547D;&#x540D; <a href="#ming-ming" class="header-anchor">#</a></h2><p>&#x5305;&#x540D;&#x662F;&#x5C06;&#x6765;&#x4F7F;&#x7528;&#x8FC7;&#x7A0B;&#x4E2D;&#x7684;&#x4E00;&#x90E8;&#x5206;&#xFF0C;&#x6240;&#x4EE5;&#x907F;&#x514D;&#x91CD;&#x590D;&#x5305;&#x540D;&#x548C;&#x7ED3;&#x6784;&#x4E0E;&#x51FD;&#x6570;&#x3002;&#x6BD4;&#x5982;</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> h client.Client &#x2192; <span class="keyword">var</span> h http.Client</span><br></pre></td></tr></table></figure>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">context.NewContext() =&gt; context.Background()</span><br></pre></td></tr></table></figure>
+<h2 id="object-creation"><a href="#Object-Creation" class="headerlink" title="Object Creation"></a>Object Creation <a href="#object-creation" class="header-anchor">#</a></h2><p>golang &#x6CA1;&#x6709;&#x6784;&#x9020;&#x51FD;&#x6570;&#xFF0C;&#x56E0;&#x6B64;&#x521B;&#x5EFA;&#x5BF9;&#x8C61;&#x4E00;&#x822C;&#x6709;&#x4E24;&#x79CD;&#x529E;&#x6CD5;</p>
+<ul>
+<li>&#x9ED8;&#x8BA4;&#x7684;<code>0</code>&#x503C;</li>
+<li>&#x5355;&#x72EC;&#x7684;&#x6784;&#x9020;&#x51FD;&#x6570;&#xFF0C;<code>NewSomething()</code></li>
+</ul>
+<p>&#x63A8;&#x8350;&#x4F7F;&#x7528;&#x9ED8;&#x8BA4; <code>0</code> &#x503C;&#x7684;&#x6784;&#x9020;&#x65B9;&#x6CD5;</p>
+<p>&#x5728;&#x9ED8;&#x8BA4;<code>0</code>&#x503C;&#x7684;&#x60C5;&#x51B5;&#x4E0B;&#xFF0C;&#x5404;&#x4E2A;&#x65B9;&#x6CD5;&#x8981;&#x5904;&#x7406;&#x597D;<code>0</code>&#x503C;&#xFF0C;&#x6BD4;&#x5982;&#x6709;&#x4E9B;&#x4E1C;&#x897F;&#x53D1;&#x73B0;&#x662F;<code>0</code>&#x503C;&#x540E;&#xFF0C;&#x7ED9;&#x5165;&#x4E00;&#x4E2A;&#x9ED8;&#x8BA4;&#x503C;&#x3002;</p>
+<p><code>New()</code> &#x6784;&#x9020;&#x51FD;&#x6570;&#x5F88;&#x7075;&#x6D3B;&#xFF0C;&#x53EF;&#x4EE5;&#x505A;&#x4EFB;&#x4F55;&#x4E8B;&#x60C5;&#xFF0C;&#x56E0;&#x6B64;&#x5BF9;&#x4E8E;&#x4EE3;&#x7801;&#x9605;&#x8BFB;&#x4E0A;&#x4E0D;&#x5229;&#xFF0C;&#x610F;&#x5473;&#x7740;&#x9690;&#x85CF;&#x4E86;&#x5F88;&#x591A;&#x4E1C;&#x897F;&#x3002;</p>
+<p>&#x6709;&#x4E9B;&#x5E93;&#x4F7F;&#x7528;&#x79C1;&#x6709; struct&#xFF0C;&#x516C;&#x5F00;&#x63A5;&#x53E3;&#x7684;&#x65B9;&#x6CD5;&#xFF0C;<code>authImpl struct</code> and <code>Auth interface</code>&#xFF0C;&#x8FD9;&#x662F;&#x53CD;&#x6A21;&#x5F0F;&#xFF0C;&#x4E0D;&#x63A8;&#x8350;&#x4F7F;&#x7528;&#x3002;</p>
+<p>&#x4E0D;&#x63A8;&#x8350;&#x4F7F;&#x7528; <strong>Singleton</strong>&#xFF0C;&#x867D;&#x7136;&#x6807;&#x51C6;&#x5E93;&#x4E2D;&#x5927;&#x91CF;&#x4F7F;&#x7528;&#x4E86; <strong>Singleton</strong> &#x6A21;&#x5F0F;&#xFF0C;&#x4F46;&#x662F; Jack &#x4E2A;&#x4EBA;&#x4E0D;&#x559C;&#x6B22;&#x8FD9;&#x79CD;&#x6A21;&#x5F0F;&#x3002;</p>
+<p>&#x4F7F;&#x7528;&#x9AD8;&#x9636;&#x51FD;&#x6570;&#x4F5C;&#x4E3A;&#x9009;&#x9879;&#x8FD9;&#x79CD;&#x5F62;&#x5F0F;&#x4E0D;&#x63A8;&#x8350;&#xFF1A;<code>NewSomething(WithThingA(), WithThingB())</code></p>
+<h2 id="ri-zhi"><a href="#&#x65E5;&#x5FD7;" class="headerlink" title="&#x65E5;&#x5FD7;"></a>&#x65E5;&#x5FD7; <a href="#ri-zhi" class="header-anchor">#</a></h2><p>&#x4E00;&#x4E9B;&#x65E5;&#x5FD7;&#x662F;&#x76F4;&#x63A5;&#x6253;&#x5370;&#x5230;&#x6807;&#x51C6;&#x8F93;&#x51FA;&#x53BB;&#xFF0C;&#x8FD9;&#x662F;&#x975E;&#x5E38;&#x4E0D;&#x597D;&#x7684;&#x8BBE;&#x8BA1;&#xFF0C;&#x56E0;&#x4E3A;&#x7528;&#x6237;&#x5982;&#x679C;&#x60F3;&#x5173;&#x6839;&#x672C;&#x5173;&#x4E0D;&#x4E86;&#x3002;</p>
+<p>&#x5EFA;&#x8BAE;</p>
+<ul>
+<li>&#x786E;&#x5B9A;&#x4E00;&#x4E0B;&#x4F5C;&#x4E3A;<strong>&#x5E93;</strong>&#x662F;&#x4E0D;&#x662F;&#x771F;&#x7684;&#x9700;&#x8981;&#x6253;&#x5370;&#x65E5;&#x5FD7;&#xFF0C;&#x662F;&#x4E0D;&#x662F;&#x5E94;&#x8BE5;&#x628A;&#x8F93;&#x51FA;&#x65E5;&#x5FD7;&#x7684;&#x5DE5;&#x4F5C;&#x4EA4;&#x7ED9;&#x8C03;&#x7528;&#x65B9;&#x51B3;&#x5B9A;&#xFF1F;</li>
+<li>&#x5982;&#x679C;&#x4E00;&#x5B9A;&#x9700;&#x8981;&#x65E5;&#x5FD7;&#xFF0C;&#x90A3;&#x4E48;&#x4F7F;&#x7528;&#x56DE;&#x8C03;&#x51FD;&#x6570;&#x65B9;&#x5F0F;</li>
+<li>&#x8F93;&#x51FA;&#x65E5;&#x5FD7;&#x5230;&#x4E00;&#x4E2A; <code>interface</code></li>
+<li>&#x4E0D;&#x8981;&#x5047;&#x5B9A;&#x4F20;&#x8FDB;&#x6765;&#x7684;&#x5C31;&#x662F;&#x6807;&#x51C6;&#x5E93;&#x7684; <code>log</code> &#xFF0C;&#x6709;&#x5F88;&#x591A;&#x9009;&#x62E9;&#x3002;</li>
+<li>&#x5C0A;&#x91CD; <code>stdout</code> &#x548C; <code>stderr</code></li>
+<li>&#x4E0D;&#x8981;&#x4F7F;&#x7528; <code>singleton</code></li>
+</ul>
+<h2 id="interface-vs-struct"><a href="#interface-vs-struct" class="headerlink" title="interface vs struct"></a><code>interface</code> vs <code>struct</code> <a href="#interface-vs-struct" class="header-anchor">#</a></h2><p>&#x63A5;&#x53D7; <code>interface</code> &#xFF0C;&#x4F46;&#x8FD4;&#x56DE;&#x7684;&#x662F; <code>struct</code></p>
+<p>&#x8FD9;&#x70B9;&#x548C; Java &#x4E0D;&#x540C;&#xFF0C;Java &#x66F4;&#x503E;&#x5411;&#x4E8E;&#x6240;&#x6709;&#x4E1C;&#x897F;&#x90FD;&#x662F;&#x901A;&#x8FC7; <code>interface</code> &#x64CD;&#x4F5C;&#x3002;&#x800C; golang &#x4E0D;&#x9700;&#x8981;&#xFF0C;golang &#x4F7F;&#x7528;&#x7684;&#x662F;&#x9690;&#x6027;<code>interface</code>&#x3002;</p>
+<h2 id="shi-me-shi-hou-panic"><a href="#&#x4EC0;&#x4E48;&#x65F6;&#x5019;-panic" class="headerlink" title="&#x4EC0;&#x4E48;&#x65F6;&#x5019; panic"></a>&#x4EC0;&#x4E48;&#x65F6;&#x5019; panic <a href="#shi-me-shi-hou-panic" class="header-anchor">#</a></h2><p>&#x6700;&#x597D;&#x90FD;&#x4E0D; <code>panic</code>&#x3002;&#x5982;&#x679C;&#x975E;&#x8981; <code>panic</code>&#xFF0C;&#x53EF;&#x80FD;&#x6700;&#x5408;&#x9002;&#x7684;&#x5730;&#x65B9;&#x662F; <code>init</code> &#x7684;&#x65F6;&#x5019;&#xFF0C;&#x56E0;&#x4E3A;&#x521A;&#x4E00;&#x8FD0;&#x884C;&#x5C31;&#x80FD;&#x770B;&#x5230;&#x6302;&#x4E86;&#xFF0C;&#x6BD4;&#x8F83;&#x5BB9;&#x6613;&#x5904;&#x7406;&#x3002;&#x4F46;&#x5373;&#x4F7F;&#x5982;&#x6B64;&#xFF0C;&#x4E5F;&#x5C3D;&#x91CF;&#x4E0D;&#x8981; <code>panic</code>&#x3002;</p>
+<h2 id="jian-cha-error"><a href="#&#x68C0;&#x67E5;-error" class="headerlink" title="&#x68C0;&#x67E5; error"></a>&#x68C0;&#x67E5; error <a href="#jian-cha-error" class="header-anchor">#</a></h2><p>&#x95EE;&#xFF1A;&#x6211;&#x4EEC;&#x662F;&#x9700;&#x8981;&#x68C0;&#x67E5;&#x6240;&#x6709;&#x7684; <code>error</code> &#x4E48;&#xFF1F;&#x6BD4;&#x5982;&#x6709;&#x4E9B;&#x4F3C;&#x4E4E;&#x4E0D;&#x5927;&#x5BB9;&#x6613;&#x51FA;&#x9519;&#x3002;<br>&#x7B54;&#xFF1A;&#x9700;&#x8981;&#xFF0C;<strong>&#x7279;&#x522B;&#x662F;&#x4F60;&#x8BF4;&#x7684;&#x8FD9;&#x4E9B;&#x4E0D;&#x5927;&#x5BB9;&#x6613;&#x51FA;&#x9519;&#x7684;&#xFF01;&#xFF01;</strong></p>
+<p>&#x6211;&#x4EEC;&#x7528; <code>error</code> &#x4EE3;&#x66FF;&#x4E86; <code>exception</code>&#xFF0C;&#x6240;&#x4EE5;&#x4E0D;&#x8981;&#x5FFD;&#x7565;&#x8FD9;&#x4E2A;&#x4E1C;&#x897F;&#x3002;</p>
+<p>&#x5904;&#x7406;&#x7684;&#x529E;&#x6CD5;</p>
+<ul>
+<li>&#x6700;&#x597D;&#x7684;&#x529E;&#x6CD5;&#x662F; Bubble up&#xFF0C;&#x4E5F;&#x5C31;&#x662F;&#x4F20;&#x56DE;&#x8C03;&#x7528;&#x65B9;</li>
+<li>&#x4F46;&#x6709;&#x7684;&#x65F6;&#x5019;&#xFF08;&#x6BD4;&#x5982; <strong>go routine</strong>) &#x4E0D;&#x9002;&#x5408;&#xFF0C;&#x90A3;&#x5C31;&#xFF1A;<ul>
+<li>&#x505A;&#x65E5;&#x5FD7;</li>
+<li>&#x6216;&#x8005;&#x589E;&#x52A0;&#x67D0;&#x4E2A;&#x8BA1;&#x6570;&#x5668;</li>
+</ul>
+</li>
+</ul>
+<p>&#x4EC0;&#x4E48;&#x65F6;&#x5019;&#x5E94;&#x8BE5;&#x8FD4;&#x56DE;&#x9519;&#x8BEF;&#x6BD4;&#x8F83;&#x5408;&#x9002;&#xFF1F;</p>
+<ul>
+<li>&#x5F53;&#x4E0D;&#x6EE1;&#x8DB3;&#x7EA6;&#x5B9A;</li>
+<li>&#x5F53;&#x9700;&#x8981;&#x7684;&#x7B54;&#x6848;&#x65E0;&#x6CD5;&#x5F97;&#x5230;</li>
+</ul>
+<h2 id="yun-xu-qi-yong-ku-de-diao-shi-neng-li"><a href="#&#x5141;&#x8BB8;&#x542F;&#x7528;&#x5E93;&#x7684;&#x8C03;&#x8BD5;&#x80FD;&#x529B;" class="headerlink" title="&#x5141;&#x8BB8;&#x542F;&#x7528;&#x5E93;&#x7684;&#x8C03;&#x8BD5;&#x80FD;&#x529B;"></a>&#x5141;&#x8BB8;&#x542F;&#x7528;&#x5E93;&#x7684;&#x8C03;&#x8BD5;&#x80FD;&#x529B; <a href="#yun-xu-qi-yong-ku-de-diao-shi-neng-li" class="header-anchor">#</a></h2><h2 id="wei-ce-shi-er-she-ji"><a href="#&#x4E3A;&#x6D4B;&#x8BD5;&#x800C;&#x8BBE;&#x8BA1;" class="headerlink" title="&#x4E3A;&#x6D4B;&#x8BD5;&#x800C;&#x8BBE;&#x8BA1;"></a>&#x4E3A;&#x6D4B;&#x8BD5;&#x800C;&#x8BBE;&#x8BA1; <a href="#wei-ce-shi-er-she-ji" class="header-anchor">#</a></h2><ul>
+<li>&#x4E3A;&#x4E86;&#x65B9;&#x4FBF;&#x81EA;&#x5DF1;&#x6D4B;&#x8BD5;</li>
+<li>&#x4E3A;&#x4E86;&#x65B9;&#x4FBF;&#x5E93;&#x7528;&#x6237;&#x6D4B;&#x8BD5;</li>
+</ul>
+<h2 id="bing-fa"><a href="#&#x5E76;&#x53D1;" class="headerlink" title="&#x5E76;&#x53D1;"></a>&#x5E76;&#x53D1; <a href="#bing-fa" class="header-anchor">#</a></h2><h3 id="channels"><a href="#channels" class="headerlink" title="channels"></a>channels <a href="#channels" class="header-anchor">#</a></h3><p>&#x867D;&#x7136; <strong>channel</strong> &#x662F; golang &#x4E00;&#x4E2A;&#x5904;&#x7406;&#x5E76;&#x53D1;&#x5F88;&#x597D;&#x5730;&#x4E1C;&#x897F;&#xFF0C;&#x4F46;&#x662F;&#x5E76;&#x975E;&#x6240;&#x6709;&#x573A;&#x5408;&#x90FD;&#x9700;&#x8981;&#x3002;&#x6BD4;&#x5982;&#x6807;&#x51C6;&#x5E93;&#x4E2D;&#x5C31;&#x5F88;&#x5C11;&#x6709;&#x5728; API &#x4E2D;&#x4F7F;&#x7528; <code>channel</code> &#x7684;&#x3002;</p>
+<ul>
+<li>&#x5C06;&#x4F7F;&#x7528; <code>channel</code> &#x7684;&#x4F4D;&#x7F6E;&#x5411;&#x4E0A;&#x5C42;&#x79FB;&#x52A8;&#x3002;</li>
+<li>&#x53EF;&#x4EE5;&#x4F7F;&#x7528;&#x56DE;&#x8C03;&#x51FD;&#x6570;&#x3002;</li>
+<li>&#x4E0D;&#x8981;&#x6DF7;&#x5408;&#x4F7F;&#x7528; <code>mutex</code> &#x548C; <code>channel</code></li>
+</ul>
+<h3 id="shi-me-shi-hou-fa-qi-goroutine"><a href="#&#x4EC0;&#x4E48;&#x65F6;&#x5019;&#x53D1;&#x8D77;-goroutine" class="headerlink" title="&#x4EC0;&#x4E48;&#x65F6;&#x5019;&#x53D1;&#x8D77; goroutine"></a>&#x4EC0;&#x4E48;&#x65F6;&#x5019;&#x53D1;&#x8D77; <code>goroutine</code> <a href="#shi-me-shi-hou-fa-qi-goroutine" class="header-anchor">#</a></h3><ul>
+<li>&#x6709;&#x4E00;&#x4E9B;&#x5E93;&#x7684; <code>New()</code> &#x4F1A;&#x53D1;&#x8D77;&#x4ED6;&#x4EEC;&#x7684; <code>goroutine</code>&#xFF0C;&#x8FD9;&#x662F;&#x4E0D;&#x597D;&#x7684;&#x3002;</li>
+<li>&#x6807;&#x51C6;&#x5E93;&#x4F7F;&#x7528;&#x7684;&#x662F; <code>Serve()</code> &#x51FD;&#x6570;&#x3002;&#x4EE5;&#x53CA;&#x5BF9;&#x5E94;&#x7684; <code>Close()</code> &#x51FD;&#x6570;</li>
+<li>&#x5C06; <code>goroutine</code> &#x5411;&#x4E0A;&#x5C42;&#x63A8;</li>
+</ul>
+<h2 id="shi-me-shi-hou-shi-yong-context-context"><a href="#&#x4EC0;&#x4E48;&#x65F6;&#x5019;&#x4F7F;&#x7528;-context-Context" class="headerlink" title="&#x4EC0;&#x4E48;&#x65F6;&#x5019;&#x4F7F;&#x7528; context.Context"></a>&#x4EC0;&#x4E48;&#x65F6;&#x5019;&#x4F7F;&#x7528; context.Context <a href="#shi-me-shi-hou-shi-yong-context-context" class="header-anchor">#</a></h2><ul>
+<li>&#x6240;&#x6709;&#x7684;&#x963B;&#x585E;&#x3001;&#x957F;&#x65F6;&#x95F4;&#x7684;&#x64CD;&#x4F5C;&#xFF0C;&#x90FD;&#x5E94;&#x8BE5;&#x53EF;&#x4EE5;&#x88AB; <code>cancel</code></li>
+<li>&#x7531;&#x4E8E; <code>context.Context</code> &#x5F88;&#x5BB9;&#x6613;&#x5B58;&#x50A8;&#x4E1C;&#x897F;&#xFF0C;&#x6240;&#x4EE5;&#x5F88;&#x5BB9;&#x6613;&#x88AB;&#x6EE5;&#x7528;&#x3002;&#x8981;&#x5C3D;&#x529B;&#x53BB;&#x907F;&#x514D;&#x4F7F;&#x7528; <code>Context</code></li>
+<li><code>Singleton</code> &#x548C; <code>context.Value()</code> &#x662F;&#x540C;&#x6837;&#x6027;&#x8D28;&#x7684;&#x4E1C;&#x897F;&#xFF0C;&#x50CF;&#x5168;&#x5C40;&#x53D8;&#x91CF;&#x4E00;&#x6837;&#xFF0C;&#x5BF9;&#x4E8E;&#x7A0B;&#x5E8F;&#x72B6;&#x6001;&#x6765;&#x8BF4;&#x662F;&#x4E2A;&#x9ED1;&#x7BB1;&#x3002;</li>
+</ul>
+<h2 id="qi-ta-zhu-yi-shi-xiang"><a href="#&#x5176;&#x5B83;&#x6CE8;&#x610F;&#x4E8B;&#x9879;" class="headerlink" title="&#x5176;&#x5B83;&#x6CE8;&#x610F;&#x4E8B;&#x9879;"></a>&#x5176;&#x5B83;&#x6CE8;&#x610F;&#x4E8B;&#x9879; <a href="#qi-ta-zhu-yi-shi-xiang" class="header-anchor">#</a></h2><ul>
+<li>&#x5982;&#x679C;&#x4EC0;&#x4E48;&#x4E1C;&#x897F;&#x5F88;&#x96BE;&#x505A;&#xFF0C;&#x55EF;&#xFF0C;&#x90A3;&#x5C31;&#x8BA9;&#x522B;&#x4EBA;&#x53BB;&#x505A;&#x5427;</li>
+<li>&#x4E3A;&#x4E86;&#x6548;&#x7387;&#x800C;&#x5347;&#x7EA7;<ul>
+<li><strong>&#x4F46;&#x662F;</strong>&#xFF0C;&#x6B63;&#x786E;&#x6027;&#x8981;&#x6BD4;&#x6548;&#x7387;&#x91CD;&#x8981;&#xFF0C;&#x5728;&#x6B63;&#x786E;&#x6027;&#x7684;&#x524D;&#x63D0;&#x4E0B;&#xFF0C;&#x6CE8;&#x610F;&#x6548;&#x7387;</li>
+</ul>
+</li>
+<li>&#x4E0D;&#x8981;&#x5728;&#x5E93;&#x4E2D;&#x4F7F;&#x7528; <code>/vendor</code> &#xFF08;&#x5728; <code>main</code> &#x5305;&#x4E2D;&#x53EF;&#x4EE5;&#xFF09;</li>
+<li>&#x6CE8;&#x610F; <strong>build tag</strong></li>
+<li>&#x4FDD;&#x6301;&#x5E72;&#x51C0;<ul>
+<li>&#x5C3D;&#x91CF;&#x4F7F;&#x7528;<em>&#x6240;&#x6709;&#x7684;</em>&#x9759;&#x6001;&#x5206;&#x6790;&#x5DE5;&#x5177;&#x6765;&#x68C0;&#x67E5;&#x4EE3;&#x7801;&#x3002;</li>
+</ul>
+</li>
+</ul>
+</div></article><div class="pagination"><a href="/post/golang-2017-09-22-video-go-for-data-science.html" class="pagination-prev">PREV</a><a href="/post/docker-2017-01-30-video-cgroups-namespaces-and-beyonds.html" class="pagination-next">NEXT</a></div><div class="comments"><div id="disqus_thread"></div></div></div><aside class="sidebar"><h3>分类标签</h3><ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/Sonatype/">Sonatype</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/blog/">blog</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/coreos/">coreos</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/docker/">docker</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/docker-summit/">docker summit</a></li></ul><h3>最新文章</h3><ul class="post-list"><li class="post-list-item"><a class="post-list-link" href="/post/golang-2017-10-27-video-how-to-correctly-use-package-context.html">视频笔记：如何正确使用 Context - Jack Lindamood</a></li><li class="post-list-item"><a class="post-list-link" href="/post/golang-2017-10-20-video-seven-ways-to-profile-go-apps.html">视频笔记：7种 Go 程序性能分析方法 - Dave Cheney</a></li><li class="post-list-item"><a class="post-list-link" href="/post/golang-2017-10-13-video-write-container-in-go-from-scratch.html">视频笔记：容器是什么？让我们用 Go 写一个吧！ - Liz Rice</a></li><li class="post-list-item"><a class="post-list-link" href="/post/golang-2017-10-09-video-the-new-era-of-go-package-management.html">视频笔记：Go 包管理的新时代 - Sam Boyer</a></li><li class="post-list-item"><a class="post-list-link" href="/post/golang-2017-10-05-video-guide-to-syscall.html">视频笔记：Go 和 syscall - Liz Rice</a></li><li class="post-list-item"><a class="post-list-link" href="/post/golang-2017-10-04-video-understanding-channels.html">视频笔记：理解 channels - Kavya Joshi</a></li><li class="post-list-item"><a class="post-list-link" href="/post/golang-2017-10-01-video-go-build-mode.html">视频笔记：Go 的构建模式 - David Crawshaw</a></li><li class="post-list-item"><a class="post-list-link" href="/post/golang-2017-09-23-video-go-for-crypto-developers.html">视频笔记：Go 密码学应用 - George Tankersley</a></li></ul></aside></section></div><div class="extra"></div><footer class="footer"><div class="row-flex-row limit-width vh-center"><div class="copyright"><p>© 2020 <a href="/">王涛</a></p></div><div class="power"><p><a href="https://pages.coding.net/">Hosted by Coding Pages</a>, 
+<a href="https://github.com/">GitHub</a>, 
+<a href="https://hexo.io">Hexo</a>, 
+<a href="https://github.com/twang2218/hexo-theme-jekyll">Jekyll</a></p></div></div></footer><script>(function(b,o,i,l,e,r){b.GoogleAnalyticsObject=l;b[l]||(b[l]=function(){(b[l].q=b[l].q||[]).push(arguments)});b[l].l=+new Date;e=o.createElement(i);r=o.getElementsByTagName(i)[0];e.src='//www.google-analytics.com/analytics.js';r.parentNode.insertBefore(e,r)}(window,document,'script','ga'));ga('create',"UA-80785538-1",'auto');ga('send','pageview');</script><script>var _hmt = _hmt || [];(function() {var hm = document.createElement("script");hm.src = "//hm.baidu.com/hm.js?ee75cf08ad330aa99f8540efa2570970";var s = document.getElementsByTagName("script")[0]; s.parentNode.insertBefore(hm, s);})();</script><script src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script><script src="//cdn.bootcss.com/mermaid/7.0.0/mermaid.min.js"></script><script>(function() {
+    var d = document, s = d.createElement('script');
+    s.src = '//twang2218-coding.disqus.com/embed.js';
+    s.setAttribute('data-timestamp', +new Date());
+    (d.head || d.body).appendChild(s);
+})();</script></body></html>
