@@ -1,4 +1,4 @@
 [submodule "themes/jekyll"]
-	path = themes/jekyll
+    path = themes/jekyll
     url = git@github.com:1x481n/hexo-theme-jekyll.git
     branch = mysite
